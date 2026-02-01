@@ -4,10 +4,24 @@ import svgToDataUri from "mini-svg-data-uri";
 import colors from "tailwindcss/colors";
 
 // Plugin to add each Tailwind color as a global CSS variable
+// Plugin to add each Tailwind color as a global CSS variable
 function addVariablesForColors({ addBase, theme }: any) {
-  const newVars = Object.fromEntries(
-    Object.entries(colors).map(([key, value]) => [`--${key}`, value])
-  );
+  const allColors = colors;
+  const newVars: Record<string, string> = {};
+
+  Object.entries(allColors).forEach(([key, value]) => {
+    if (["lightBlue", "warmGray", "trueGray", "coolGray", "blueGray"].includes(key)) return;
+
+    if (typeof value === 'string') {
+      newVars[`--${key}`] = value;
+    } else if (typeof value === 'object' && value !== null) {
+      Object.entries(value).forEach(([subKey, subValue]) => {
+        if (typeof subValue === 'string') {
+          newVars[`--${key}-${subKey}`] = subValue;
+        }
+      });
+    }
+  });
 
   addBase({
     ':root': newVars,
